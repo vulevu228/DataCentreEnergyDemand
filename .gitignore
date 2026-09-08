@@ -1,0 +1,8 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+*.log
+.cache/
+# keep data/ tracked once the panel exists; ignore scratch parquet for now
+data/*.parquet
