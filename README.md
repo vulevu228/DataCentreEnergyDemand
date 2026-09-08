@@ -5,7 +5,10 @@
 > (Northern Virginia / PJM, Ireland, Germany) against a proxy for AI-compute
 > growth — the demand-side sequel to [`GermanEnergyDashboard`](../GermanEnergyDashboard).
 
-Status: **scaffold** — methodology written, extraction not yet implemented.
+Status: **extraction implemented, not yet run at full scale.** All three
+fetchers and the join/panel builder are written; a first real backfill needs
+the two API keys below. The analysis stage (pre-2023 trend projection) and the
+Power BI report are still to come.
 See **[`METHODOLOGY.md`](METHODOLOGY.md)** for what this measures, which regions
 and why, the output schema, and the (many) caveats.
 
@@ -57,25 +60,36 @@ copy .env.example .env                                # then fill in the keys
   asking for API access (they enable a "Web API Security Token" on your account)
 - Hugging Face needs no key.
 
-## Run (once implemented)
+## Run
 
 ```bash
 python run_extract.py --sources eia,entsoe,hf --since 2019-01-01
-python run_extract.py --sources hf            # daily proxy snapshot
+python run_extract.py --sources hf            # proxy-only top-up, no keys needed
 ```
 
 Output: one tidy CSV (`data/demand_panel.csv`) — schema in `METHODOLOGY.md` §3.
+`--sources hf` works with no keys and is the quickest way to see the pipeline
+end to end.
 
 ## Layout
 
 ```
 METHODOLOGY.md      the actual thinking — read this first
-config.py           regions, EIC codes, baseline years, source metadata (reference data)
+config.py           regions, EIC codes, baseline years, REGION_META (reference data)
 extract/
-  http.py           shared HTTP GET with retry/backoff        [stub]
-  eia.py            US load fetcher                            [stub]
-  entsoe.py         EU load fetcher                            [stub]
-  hf.py             Hugging Face model-growth fetcher          [stub]
-  join.py           merge the three into the tidy panel       [stub]
-run_extract.py      CLI orchestration                         [stub]
+  net.py            shared HTTP GET with retry/backoff (not "http" — stdlib clash)
+  eia.py            US load fetcher (EIA Open Data v2, JSON, paged)
+  entsoe.py         EU load fetcher (ENTSO-E Transparency, XML, year-chunked)
+  hf.py             Hugging Face model-growth + downloads proxy
+  join.py           reshape to the tidy panel + load_index + yoy_growth
+run_extract.py      CLI orchestration (fetch -> join.build_panel -> CSV)
 ```
+
+## What's left
+
+- [ ] add `EIA_API_KEY` and `ENTSOE_API_KEY` to `.env`, run the first full backfill
+- [ ] sanity-check the `(verify)` codes in `config.py` against the live responses
+- [ ] analysis stage: fit each region's load trend on pre-2023 data, project it
+      forward, and store the projection as `is_forecast=1` rows (METHODOLOGY §4)
+- [ ] `datacentre-demand.pbix` — actual vs projected per region, `load_index`
+      small multiples, HF proxy on a second axis

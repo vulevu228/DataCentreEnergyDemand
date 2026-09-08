@@ -64,3 +64,15 @@ PANEL_COLUMNS = [
     "region_id", "region_label", "metric", "timestamp",
     "value", "source", "is_forecast", "retrieved_at",
 ]
+
+# region_id -> (human label, source tag). Assembled from the lists above so
+# join.build_panel() can label a fetcher's output without extra plumbing.
+REGION_META: dict[str, tuple[str, str]] = {}
+REGION_META.update({rid: (label, "eia") for rid, _resp, _sub, label, _role in EIA_REGIONS})
+REGION_META.update({rid: (label, "entsoe") for rid, _eic, label, _role in ENTSOE_ZONES})
+REGION_META[HF_PROXY_REGION_ID] = ("Hugging Face model growth", "huggingface")
+
+# metrics that represent a raw electricity-load time series (as opposed to the
+# HF proxy or a derived index) - used by join.py to decide what to resample and
+# what to build indices / growth rates from.
+LOAD_METRICS = ("load_mwh", "load_mw")
