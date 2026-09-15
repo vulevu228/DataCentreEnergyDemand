@@ -130,6 +130,14 @@ changed after 2022), but it makes the "bend" legible on one chart.
   not proportional to energy use.
 - **No weather normalisation in v1.** Cross-region and pre/post comparisons are
   affected by weather-year differences. Flagged, not fixed.
+- **Isolated bad EIA readings are dropped, not imputed.** Confirmed live
+  2026-09-15: PJM and PJM-DOM both carried a single day (2021-10-19) at
+  2,000-8,000x their normal load, and SWPP one day (2023-06-13) at ~4x its
+  next-highest - one bad upstream read each, not real demand events (those
+  ramp over days, not spike on one isolated day). `join.py` drops any daily
+  value more than 5x the centred 7-day rolling median before it can distort
+  `load_index`'s baseline-year mean or the forecast fit. A handful of days
+  are simply absent from the panel for these three regions as a result.
 - **Time zones.** EIA returns local-time-with-offset; ENTSO-E returns UTC in
   a `GL_MarketDocument`. Everything is converted to UTC on ingest. DST folds
   are handled by using tz-aware parsing, not naive strings.

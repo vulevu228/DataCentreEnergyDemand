@@ -5,10 +5,10 @@
 > (Northern Virginia / PJM, Ireland, Germany) against a proxy for AI-compute
 > growth — the demand-side sequel to [`GermanEnergyDashboard`](../GermanEnergyDashboard).
 
-Status: **extraction implemented, not yet run at full scale.** All three
-fetchers and the join/panel builder are written; a first real backfill needs
-the two API keys below. The analysis stage (pre-2023 trend projection) and the
-Power BI report are still to come.
+Status: **extraction + forecast stage done, `data/demand_panel.csv` built.**
+All three sources (EIA, ENTSO-E, Hugging Face) are backfilled from
+2019-01-01, and the pre-2023 trend projection (Prophet, `is_forecast=1` rows)
+is in. Only the Power BI report is left.
 See **[`METHODOLOGY.md`](METHODOLOGY.md)** for what this measures, which regions
 and why, the output schema, and the (many) caveats.
 
@@ -81,15 +81,18 @@ extract/
   eia.py            US load fetcher (EIA Open Data v2, JSON, paged)
   entsoe.py         EU load fetcher (ENTSO-E Transparency, XML, year-chunked)
   hf.py             Hugging Face model-growth + downloads proxy
-  join.py           reshape to the tidy panel + load_index + yoy_growth
+  join.py           reshape to the tidy panel + load_index + yoy_growth +
+                    isolated-outlier filtering (METHODOLOGY §5)
 run_extract.py      CLI orchestration (fetch -> join.build_panel -> CSV)
+run_forecast.py     analysis stage: Prophet trend fit per region on pre-2023
+                    load_index, projected forward as is_forecast=1 rows
 ```
 
 ## What's left
 
-- [ ] add `EIA_API_KEY` and `ENTSOE_API_KEY` to `.env`, run the first full backfill
-- [ ] sanity-check the `(verify)` codes in `config.py` against the live responses
-- [ ] analysis stage: fit each region's load trend on pre-2023 data, project it
+- [x] add `EIA_API_KEY` and `ENTSOE_API_KEY` to `.env`, run the first full backfill
+- [x] sanity-check the `(verify)` codes in `config.py` against the live responses
+- [x] analysis stage: fit each region's load trend on pre-2023 data, project it
       forward, and store the projection as `is_forecast=1` rows (METHODOLOGY §4)
 - [ ] `datacentre-demand.pbix` — actual vs projected per region, `load_index`
-      small multiples, HF proxy on a second axis
+      small multiples, HF `hf_models_cumulative` proxy on a second axis

@@ -27,7 +27,7 @@ EIA_REGIONS = [
     ("US-PJM",          "PJM",      None,   "PJM Interconnection",     "dc_heavy"),
     ("US-PJM-DOM",      "PJM",      "DOM",  "Dominion / N. Virginia",  "dc_core"),
     ("US-ERCO",         "ERCO",     None,   "ERCOT (Texas)",           "dc_growing"),
-    ("US-SWPP",         "SWPP",     None,   "Southwest Power Pool",    "control"),  # (verify choice)
+    ("US-SWPP",         "SWPP",     None,   "Southwest Power Pool",    "control"),  # confirmed 2026-09-15: deliberately low-DC-density baseline
 ]
 EIA_DEMAND_TYPE = "D"        # D=demand, DF=day-ahead forecast, NG=net generation, TI=interchange
 
@@ -37,12 +37,16 @@ ENTSOE_LOAD_DOCTYPE = "A65"  # System total load
 ENTSOE_PROCESS_ACTUAL = "A16"  # realised
 ENTSOE_ZONES = [
     # region_id,     eic_domain,             label,                 role
-    ("EU-IE-SEM",   "10Y1001A1001A59C",     "Ireland (SEM)",        "dc_core"),      # (verify)
-    ("EU-DE-LU",    "10Y1001A1001A82H",     "Germany-Luxembourg",   "dc_heavy"),     # (verify)
-    ("EU-PT",       "10YPT-REN------W",     "Portugal",             "control"),      # (verify)
+    ("EU-IE-SEM",   "10Y1001A1001A59C",     "Ireland (SEM)",        "dc_core"),      # verified live 2026-09-14
+    ("EU-DE-LU",    "10Y1001A1001A82H",     "Germany-Luxembourg",   "dc_heavy"),     # verified live 2026-09-14
+    ("EU-PT",       "10YPT-REN------W",     "Portugal",             "control"),      # verified live 2026-09-14
 ]
-# ENTSO-E rejects intervals longer than ~1 year per call - chunk requests.
-ENTSOE_MAX_DAYS = 365
+# ENTSO-E rejects intervals longer than P1M (one calendar month) per call for
+# the ACTUAL_TOTAL_LOAD_R3:XML export (confirmed live 2026-09-14 - the API
+# error text names "P1M" explicitly; the old 365-day assumption was wrong and
+# threw HTTP 400). 27 days keeps every chunk under a month regardless of
+# calendar-month length.
+ENTSOE_MAX_DAYS = 27
 
 # Calibration anchor: the one region with an official DC-share number.
 # EirGrid / CRU: data centres ~21% of metered electricity in 2023.

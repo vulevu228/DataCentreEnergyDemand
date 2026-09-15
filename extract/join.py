@@ -23,6 +23,28 @@ import config
 _NOW = lambda: pd.Timestamp.now(tz="UTC")   # noqa: E731 - short helper for retrieved_at
 
 
+def _drop_isolated_spikes(s: pd.Series, window: int = 7, factor: float = 5.0) -> pd.Series:
+    """Null out single-day values that dwarf their neighbours.
+
+    EIA's hourly feed occasionally returns a corrupt reading for one day that
+    the daily mean then carries at full scale (confirmed live 2026-09-15:
+    PJM + PJM-DOM both show a single day at ~2000-8000x their normal range,
+    same date, and SWPP shows one day ~4x its next-highest - one bad upstream
+    read each, not a real demand event, which would ramp over several days
+    rather than spike on one isolated day). Flag a value as an outlier when
+    it exceeds `factor` times the centred rolling median of its `window`
+    neighbours; the flagged day is dropped rather than imputed; it is
+    the difference between a real event and a sensor glitch, so this must
+    stay conservative (widely-separated real spikes untouched).
+    """
+    rolling_median = s.rolling(window, center=True, min_periods=3).median()
+    is_spike = s > rolling_median * factor
+    if is_spike.any():
+        print(f"  ! dropping {is_spike.sum()} isolated outlier day(s): "
+              f"{list(s.index[is_spike].date)}")
+    return s[~is_spike]
+
+
 def to_panel_rows(
     df: pd.DataFrame,
     *,
@@ -48,6 +70,7 @@ def to_panel_rows(
         s = grp.set_index("timestamp")["value"].sort_index()
         if metric in config.LOAD_METRICS and config.RESAMPLE:
             s = s.resample(config.RESAMPLE).mean().dropna()
+            s = _drop_isolated_spikes(s)
         out_parts.append(pd.DataFrame({"timestamp": s.index, "value": s.values, "metric": metric}))
 
     out = pd.concat(out_parts, ignore_index=True)

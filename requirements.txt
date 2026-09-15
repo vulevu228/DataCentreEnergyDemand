@@ -1,6 +1,5 @@
 requests>=2.31
 pandas>=2.0
 python-dotenv>=1.0
-# analysis / forecast stage (not needed just to extract):
-# prophet>=1.1
-# matplotlib>=3.7
+# analysis / forecast stage (run_forecast.py)
+prophet>=1.1

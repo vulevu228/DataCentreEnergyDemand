@@ -5,6 +5,11 @@ config.py and writes the tidy panel to data/demand_panel.csv.
     python run_extract.py --sources eia,entsoe,hf --since 2019-01-01
     python run_extract.py --sources hf            # just the proxy top-up
 
+--hf-since (default 2023-01-01) is separate from --since: the HF proxy is
+built by walking every model created since that date, and the Hub currently
+adds ~3-4k models/day (growing), so a full 2019 walk would take very long
+and blow past the fetcher's safety cap before reaching 2019 anyway.
+
 Keys are read from a local .env (see .env.example):
     EIA_API_KEY     - instant from https://www.eia.gov/opendata/register.php
     ENTSOE_API_KEY  - free account + email request to transparency@entsoe.eu
@@ -31,6 +36,11 @@ def parse_args(argv=None) -> argparse.Namespace:
                    help="start date (YYYY-MM-DD) for the load backfill")
     p.add_argument("--until", default=date.today().isoformat(),
                    help="end date (YYYY-MM-DD), default today")
+    p.add_argument("--hf-since", default="2023-01-01",
+                   help="start date (YYYY-MM-DD) for the HF model-growth proxy "
+                        "(kept separate from --since: walking the HF catalogue is "
+                        "O(models created since that date), and current growth is "
+                        "~3-4k models/day, so a full 2019 walk is impractical)")
     p.add_argument("--out", default=str(config.PANEL_CSV), help="output CSV path")
     return p.parse_args(argv)
 
@@ -43,7 +53,7 @@ def _require(var: str) -> str:
     return val
 
 
-def collect(sources: set[str], since: str, until: str) -> dict[str, pd.DataFrame]:
+def collect(sources: set[str], since: str, until: str, hf_since: str) -> dict[str, pd.DataFrame]:
     """Run each requested fetcher and return {region_id: [timestamp, value, metric]}."""
     frames: dict[str, pd.DataFrame] = {}
 
@@ -66,7 +76,7 @@ def collect(sources: set[str], since: str, until: str) -> dict[str, pd.DataFrame
 
     # --- Hugging Face: one global proxy series (no key) -----------------
     if "hf" in sources:
-        proxy = hf.fetch_hf_model_counts(since=since)
+        proxy = hf.fetch_hf_model_counts(since=hf_since)
         # append the point-in-time downloads snapshot so history builds up over runs
         proxy = pd.concat([proxy, hf.snapshot_hf_downloads()], ignore_index=True)
         frames[config.HF_PROXY_REGION_ID] = proxy
@@ -82,7 +92,7 @@ def main(argv=None) -> int:
     if unknown:
         raise SystemExit(f"unknown source(s): {', '.join(sorted(unknown))}")
 
-    frames = collect(sources, args.since, args.until)
+    frames = collect(sources, args.since, args.until, args.hf_since)
     frames = {rid: df for rid, df in frames.items() if df is not None and not df.empty}
     if not frames:
         raise SystemExit("no data fetched - nothing to write")
