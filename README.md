@@ -78,8 +78,10 @@ end to end.
 the CSV, since Desktop imports Excel more reliably than a 48k-row CSV).
 Dark amber "Grid Amber" theme, Rockwell for titles/KPI numbers, two pages.
 
-A rendered PDF/PNG export lives alongside the `.pbip` for anyone without
-Power BI Desktop — `datacentre-demand.png` / `.pdf`.
+![Data-Centre Energy Demand dashboard](datacentre-demand.png)
+
+A static export (`datacentre-demand.png`) lives alongside the `.pbip` for
+anyone without Power BI Desktop.
 
 ### Page 1 — Overview
 
@@ -195,7 +197,7 @@ run_forecast.py             analysis stage: Prophet trend fit per region on pre-
                             load_index, projected forward as is_forecast=1 rows
 theme/grid-amber-theme.json importable Power BI theme (View → Themes → Browse)
 datacentre-demand.pbip      Power BI project — data model + report (see "The Dashboard")
-datacentre-demand.png/.pdf  static export of the report, for viewing without Desktop
+datacentre-demand.png       static export of the report, for viewing without Desktop
 ```
 
 ## What's left
