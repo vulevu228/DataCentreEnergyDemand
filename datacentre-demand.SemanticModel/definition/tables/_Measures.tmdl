@@ -148,25 +148,25 @@ table _Measures
 		lineageTag: f2c3a4b5-6d7e-4890-9c1d-2e3f40516301
 
 	measure 'KPI DC-Heavy Display' =
-			FORMAT([Load Index (Actual, DC-Heavy)], "0.0") & " (index, 2021=100)   " &
+			FORMAT([Load Index (Actual, DC-Heavy)], "0.0") & "   " &
 			IF([Load Index YoY Delta (DC-Heavy)] >= 0, "▲ ", "▼ ") &
 			FORMAT(ABS([Load Index YoY Delta (DC-Heavy)]), "0.0%") & " vs. year ago"
 		displayFolder: 5. KPI card text
 		lineageTag: f2c3a4b5-6d7e-4890-9c1d-2e3f4051627e
 
 	measure 'KPI Control Display' =
-			FORMAT([Load Index (Actual, Control)], "0.0") & " (index, 2021=100)   " &
+			FORMAT([Load Index (Actual, Control)], "0.0") & "   " &
 			IF([Load Index YoY Delta (Control)] >= 0, "▲ ", "▼ ") &
 			FORMAT(ABS([Load Index YoY Delta (Control)]), "0.0%") & " vs. year ago"
 		displayFolder: 5. KPI card text
 		lineageTag: f2c3a4b5-6d7e-4890-9c1d-2e3f4051627f
 
-	measure 'KPI Trend Gap Display' = FORMAT([Trend Gap %], "+0.0%;-0.0%") & " vs. pre-2023 trend (data-centre regions avg.)"
+	measure 'KPI Trend Gap Display' = FORMAT([Trend Gap %], "+0.0%;-0.0%") & " vs. pre-2023 trend"
 		displayFolder: 5. KPI card text
 		lineageTag: f2c3a4b5-6d7e-4890-9c1d-2e3f40516280
 
 	measure 'KPI HF Proxy Display' =
-			FORMAT([HF Cumulative Models], "#,##0") & " models on Hugging Face   " &
+			FORMAT([HF Cumulative Models], "#,##0") & "   " &
 			FORMAT([HF MoM Growth %], "+0.0%;-0.0%") & " vs. last month"
 		displayFolder: 5. KPI card text
 		lineageTag: f2c3a4b5-6d7e-4890-9c1d-2e3f40516281

@@ -76,14 +76,12 @@ end to end.
 `datacentre-demand.pbip` (open with Power BI Desktop — File → Open → the
 `.pbip` file; it pulls from `data/demand_panel.xlsx`, a straight export of
 the CSV, since Desktop imports Excel more reliably than a 48k-row CSV).
-Dark amber "Grid Amber" theme, Rockwell for titles/KPI numbers, two pages.
+Dark amber "Grid Amber" theme, Rockwell for titles/KPI numbers, one page.
 
 ![Data-Centre Energy Demand dashboard](datacentre-demand.png)
 
 A static export (`datacentre-demand.png`) lives alongside the `.pbip` for
 anyone without Power BI Desktop.
-
-### Page 1 — Overview
 
 **KPI strip (top).** Four cards, each a number *plus* its own comparison —
 never a bare figure:
@@ -159,14 +157,13 @@ excluded from that filter and always shows).
 YoY, MoM, and what Hugging Face is, for anyone landing on this without
 context.
 
-### Page 2 — Source & Unit Detail
-
-Load broken down by data source (EIA vs. ENTSO-E) and native unit
-(`load_mw` vs. `load_mwh`). **Deduction / why this page exists:** EU regions
-report in **MW**, US regions in **MWh/day** — genuinely different units at
-genuinely different scales, which is *why* every other page uses the
-indexed `load_index` instead of raw values. This page is the receipt for
-that choice.
+**Raw Load by Source & Unit (bottom).** Load broken down by data source
+(EIA vs. ENTSO-E) and native unit (`load_mw` vs. `load_mwh`).
+**Deduction / why this chart exists:** EU regions report in **MW**, US
+regions in **MWh/day** — genuinely different units at genuinely different
+scales, which is *why* every other chart on this page uses the indexed
+`load_index` instead of raw values. This chart is the receipt for that
+choice.
 
 ### A caveat worth stating plainly
 
