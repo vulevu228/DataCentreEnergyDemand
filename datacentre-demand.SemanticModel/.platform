@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "datacentre-demand"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "8b15a721-c2d9-453c-a063-699505f40166"
+  }
+}

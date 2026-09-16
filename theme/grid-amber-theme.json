@@ -1,0 +1,146 @@
+{
+  "name": "Grid Amber",
+  "dataColors": [
+    "#F5A623",
+    "#5C7A80",
+    "#E8590C",
+    "#C97C3D",
+    "#8C7B6B",
+    "#FFC94D",
+    "#3E5C61",
+    "#B8860B"
+  ],
+  "background": "#1C1410",
+  "foreground": "#F5EFE6",
+  "tableAccent": "#F5A623",
+  "good": "#FFC94D",
+  "bad": "#C0453A",
+  "neutral": "#8C7B6B",
+  "maximum": "#F5A623",
+  "center": "#8C7B6B",
+  "minimum": "#241A14",
+  "null": "#3A2E24",
+  "textClasses": {
+    "title": {
+      "fontFace": "Rockwell",
+      "fontSize": 20,
+      "color": "#F5EFE6"
+    },
+    "header": {
+      "fontFace": "Rockwell",
+      "fontSize": 13,
+      "color": "#F5EFE6"
+    },
+    "label": {
+      "fontFace": "Segoe UI",
+      "fontSize": 10,
+      "color": "#B8A992"
+    },
+    "callout": {
+      "fontFace": "Rockwell",
+      "fontSize": 32,
+      "color": "#F5A623"
+    }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [
+          {
+            "color": { "solid": { "color": "#241A14" } },
+            "transparency": 20
+          }
+        ],
+        "border": [
+          { "show": false }
+        ],
+        "dropShadow": [
+          { "show": false }
+        ],
+        "outspace": [
+          {
+            "color": { "solid": { "color": "#140D0A" } }
+          }
+        ]
+      }
+    },
+    "card": {
+      "*": {
+        "background": [
+          { "color": { "solid": { "color": "#241A14" } }, "transparency": 0 }
+        ],
+        "labels": [
+          { "color": "#F5A623", "fontFamily": "Rockwell", "fontSize": 28 }
+        ],
+        "categoryLabels": [
+          { "color": "#B8A992", "fontFamily": "Segoe UI", "fontSize": 11 }
+        ]
+      }
+    },
+    "multiRowCard": {
+      "*": {
+        "background": [
+          { "color": { "solid": { "color": "#241A14" } } }
+        ],
+        "dataLabels": [
+          { "color": "#F5A623", "fontFamily": "Rockwell", "fontSize": 22 }
+        ],
+        "categoryLabels": [
+          { "color": "#B8A992", "fontFamily": "Segoe UI", "fontSize": 10 }
+        ]
+      }
+    },
+    "lineChart": {
+      "*": {
+        "categoryAxis": [
+          { "color": "#B8A992", "gridlineColor": "#3A2E24", "fontFamily": "Segoe UI" }
+        ],
+        "valueAxis": [
+          { "color": "#B8A992", "gridlineColor": "#3A2E24", "fontFamily": "Segoe UI" }
+        ],
+        "legend": [
+          { "color": "#F5EFE6", "fontFamily": "Segoe UI" }
+        ]
+      }
+    },
+    "clusteredBarChart": {
+      "*": {
+        "categoryAxis": [
+          { "color": "#B8A992", "gridlineColor": "#3A2E24", "fontFamily": "Segoe UI" }
+        ],
+        "valueAxis": [
+          { "color": "#B8A992", "gridlineColor": "#3A2E24", "fontFamily": "Segoe UI" }
+        ],
+        "dataLabels": [
+          { "color": "#F5EFE6", "fontFamily": "Segoe UI" }
+        ]
+      }
+    },
+    "columnChart": {
+      "*": {
+        "categoryAxis": [
+          { "color": "#B8A992", "gridlineColor": "#3A2E24", "fontFamily": "Segoe UI" }
+        ],
+        "valueAxis": [
+          { "color": "#B8A992", "gridlineColor": "#3A2E24", "fontFamily": "Segoe UI" }
+        ]
+      }
+    },
+    "slicer": {
+      "*": {
+        "background": [
+          { "color": { "solid": { "color": "#241A14" } } }
+        ],
+        "items": [
+          { "fontColor": "#F5EFE6", "fontFamily": "Segoe UI" }
+        ],
+        "header": [
+          { "fontColor": "#F5A623", "fontFamily": "Rockwell", "show": true }
+        ]
+      }
+    },
+    "textbox": {
+      "*": {}
+    }
+  }
+}

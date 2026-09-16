@@ -1,0 +1,4 @@
+relationship a1b2c3d4-2222-4333-8444-555566667777
+	fromColumn: demand_panel.region_id
+	toColumn: RegionMeta.region_id
+

@@ -1,0 +1,93 @@
+table demand_panel
+	lineageTag: 5c369175-42c7-4c7e-81be-345050a0f45a
+
+	column region_id
+		dataType: string
+		lineageTag: 95de14dd-aa47-4831-bbef-cc695ff09a97
+		summarizeBy: none
+		sourceColumn: region_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column region_label
+		dataType: string
+		lineageTag: c6889c99-bfe3-4766-b5b3-8ef0d4004863
+		summarizeBy: none
+		sourceColumn: region_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column metric
+		dataType: string
+		lineageTag: cd175dd3-4f75-4cb2-929d-fb1b244280d1
+		summarizeBy: none
+		sourceColumn: metric
+
+		annotation SummarizationSetBy = Automatic
+
+	column timestamp
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: e3c9a2e0-4fa0-4d99-b3d5-bbbc24317ffe
+		summarizeBy: none
+		sourceColumn: timestamp
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column value
+		dataType: double
+		lineageTag: ad45a993-0eea-4787-89dc-7c03b4a71abc
+		summarizeBy: sum
+		sourceColumn: value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column source
+		dataType: string
+		lineageTag: dae12bb6-6715-4db0-9e0a-7fcaee56bfe0
+		summarizeBy: none
+		sourceColumn: source
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_forecast
+		dataType: int64
+		formatString: 0
+		lineageTag: 868a2fc5-2abd-4024-86cb-4e930b4c77b4
+		summarizeBy: sum
+		sourceColumn: is_forecast
+
+		annotation SummarizationSetBy = Automatic
+
+	column retrieved_at
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: fa3fa1c6-b911-4da0-8b7a-727fa05f32d2
+		summarizeBy: none
+		sourceColumn: retrieved_at
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition demand_panel = m
+		mode: import
+		source =
+				let
+				  Source = Excel.Workbook(File.Contents("C:\Users\emira\Projects\GitHub-Projects\DataCentreEnergyDemand\data\demand_panel.xlsx"), null, true),
+				  #"Navigation 1" = Source{[Item = "demand_panel", Kind = "Sheet"]}[Data],
+				  #"Promoted headers" = Table.PromoteHeaders(#"Navigation 1", [PromoteAllScalars = true]),
+				  #"Changed column type" = Table.TransformColumnTypes(#"Promoted headers", {{"region_id", type text}, {"region_label", type text}, {"metric", type text}, {"timestamp", type text}, {"value", type number}, {"source", type text}, {"is_forecast", Int64.Type}, {"retrieved_at", type text}}, "en-US"),
+				    #"Filtered Rows" = Table.SelectRows(#"Changed column type", each true),
+				    #"Changed Type" = Table.TransformColumns(#"Filtered Rows", {{"timestamp", each Date.FromText(Text.Start(_, 10)), type date}, {"retrieved_at", each Date.FromText(Text.Start(_, 10)), type date}})
+				in
+				  #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

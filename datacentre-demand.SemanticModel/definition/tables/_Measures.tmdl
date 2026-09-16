@@ -1,0 +1,182 @@
+table _Measures
+	lineageTag: f2c3a4b5-6d7e-4890-9c1d-2e3f40516273
+
+	measure 'Latest Date' = CALCULATE(MAX(demand_panel[timestamp]), demand_panel[metric] = "load_index", demand_panel[is_forecast] = 0, ALL(RegionMeta))
+		formatString: Long Date
+		displayFolder: 1. Base measures
+		lineageTag: f2c3a4b5-6d7e-4890-9c1d-2e3f40516300
+
+	measure 'Load Index (Actual)' =
+			VAR LatestDate =
+			    CALCULATE(MAX(demand_panel[timestamp]), demand_panel[metric] = "load_index", demand_panel[is_forecast] = 0)
+			RETURN
+			    CALCULATE(
+			        SUM(demand_panel[value]),
+			        demand_panel[metric] = "load_index",
+			        demand_panel[is_forecast] = 0,
+			        demand_panel[timestamp] = LatestDate
+			    )
+		formatString: #,##0.0
+		displayFolder: 1. Base measures
+		lineageTag: f2c3a4b5-6d7e-4890-9c1d-2e3f40516274
+
+	measure 'Load Index (Forecast)' =
+			VAR LatestDate =
+			    CALCULATE(MAX(demand_panel[timestamp]), demand_panel[metric] = "load_index", demand_panel[is_forecast] = 1)
+			RETURN
+			    CALCULATE(
+			        SUM(demand_panel[value]),
+			        demand_panel[metric] = "load_index",
+			        demand_panel[is_forecast] = 1,
+			        demand_panel[timestamp] = LatestDate
+			    )
+		formatString: #,##0.0
+		displayFolder: 1. Base measures
+		lineageTag: f2c3a4b5-6d7e-4890-9c1d-2e3f40516275
+
+	measure 'HF Cumulative Models' =
+			VAR LatestDate = CALCULATE(MAX(demand_panel[timestamp]), demand_panel[metric] = "hf_models_cumulative", ALL(RegionMeta))
+			RETURN
+			    CALCULATE(
+			        SUM(demand_panel[value]),
+			        demand_panel[metric] = "hf_models_cumulative",
+			        demand_panel[timestamp] = LatestDate,
+			        ALL(RegionMeta)
+			    )
+		formatString: #,##0
+		displayFolder: 1. Base measures
+		lineageTag: f2c3a4b5-6d7e-4890-9c1d-2e3f4051627b
+
+	measure 'Load Index (Actual, DC-Heavy)' =
+			VAR LatestDate = [Latest Date]
+			RETURN
+			    CALCULATE(
+			        AVERAGE(demand_panel[value]),
+			        demand_panel[metric] = "load_index",
+			        demand_panel[is_forecast] = 0,
+			        demand_panel[timestamp] = LatestDate,
+			        RegionMeta[role] = "DC-Heavy"
+			    )
+		formatString: #,##0.0
+		displayFolder: 2. By region role
+		lineageTag: f2c3a4b5-6d7e-4890-9c1d-2e3f40516276
+
+	measure 'Load Index (Actual, Control)' =
+			VAR LatestDate = [Latest Date]
+			RETURN
+			    CALCULATE(
+			        AVERAGE(demand_panel[value]),
+			        demand_panel[metric] = "load_index",
+			        demand_panel[is_forecast] = 0,
+			        demand_panel[timestamp] = LatestDate,
+			        RegionMeta[role] = "Control"
+			    )
+		formatString: #,##0.0
+		displayFolder: 2. By region role
+		lineageTag: f2c3a4b5-6d7e-4890-9c1d-2e3f40516277
+
+	measure 'Load Index YoY Delta (DC-Heavy)' =
+			VAR PriorDate = EDATE([Latest Date], -12)
+			VAR Cur = [Load Index (Actual, DC-Heavy)]
+			VAR Prior = CALCULATE([Load Index (Actual, DC-Heavy)], demand_panel[timestamp] = PriorDate)
+			RETURN
+			    DIVIDE(Cur - Prior, Prior)
+		formatString: +0.0%;-0.0%
+		displayFolder: 3. Time comparisons
+		lineageTag: f2c3a4b5-6d7e-4890-9c1d-2e3f40516278
+
+	measure 'Load Index YoY Delta (Control)' =
+			VAR PriorDate = EDATE([Latest Date], -12)
+			VAR Cur = [Load Index (Actual, Control)]
+			VAR Prior = CALCULATE([Load Index (Actual, Control)], demand_panel[timestamp] = PriorDate)
+			RETURN
+			    DIVIDE(Cur - Prior, Prior)
+		formatString: +0.0%;-0.0%
+		displayFolder: 3. Time comparisons
+		lineageTag: f2c3a4b5-6d7e-4890-9c1d-2e3f40516279
+
+	measure 'Trend Gap %' =
+			VAR CurDate = [Latest Date]
+			VAR Act =
+			    CALCULATE(
+			        AVERAGE(demand_panel[value]),
+			        demand_panel[metric] = "load_index",
+			        demand_panel[is_forecast] = 0,
+			        demand_panel[timestamp] = CurDate,
+			        RegionMeta[role] = "DC-Heavy"
+			    )
+			VAR Fcst =
+			    CALCULATE(
+			        AVERAGE(demand_panel[value]),
+			        demand_panel[metric] = "load_index",
+			        demand_panel[is_forecast] = 1,
+			        demand_panel[timestamp] = CurDate,
+			        RegionMeta[role] = "DC-Heavy"
+			    )
+			RETURN
+			    DIVIDE(Act - Fcst, Fcst)
+		formatString: +0.0%;-0.0%
+		displayFolder: 3. Time comparisons
+		lineageTag: f2c3a4b5-6d7e-4890-9c1d-2e3f4051627a
+
+	measure 'HF MoM Growth %' =
+			VAR CurDate = CALCULATE(MAX(demand_panel[timestamp]), demand_panel[metric] = "hf_models_cumulative", ALL(RegionMeta))
+			VAR PriorDate = EDATE(CurDate, -1)
+			VAR Cur = [HF Cumulative Models]
+			VAR Prior = CALCULATE([HF Cumulative Models], demand_panel[timestamp] = PriorDate, ALL(RegionMeta))
+			RETURN
+			    DIVIDE(Cur - Prior, Prior)
+		formatString: +0.0%;-0.0%
+		displayFolder: 3. Time comparisons
+		lineageTag: f2c3a4b5-6d7e-4890-9c1d-2e3f4051627c
+
+	measure 'Latest YoY Growth %' =
+			VAR LatestDate = CALCULATE(MAX(demand_panel[timestamp]), demand_panel[metric] = "yoy_growth_pct")
+			RETURN
+			    CALCULATE(
+			        SUM(demand_panel[value]),
+			        demand_panel[metric] = "yoy_growth_pct",
+			        demand_panel[is_forecast] = 0,
+			        demand_panel[timestamp] = LatestDate
+			    ) / 100
+		formatString: +0.0%;-0.0%
+		displayFolder: 3. Time comparisons
+		lineageTag: f2c3a4b5-6d7e-4890-9c1d-2e3f4051627d
+
+	measure 'YoY Growth Color' = IF([Latest YoY Growth %] >= 0, "#3FA34D", "#C0453A")
+		displayFolder: 4. Formatting helpers
+		lineageTag: f2c3a4b5-6d7e-4890-9c1d-2e3f40516301
+
+	measure 'KPI DC-Heavy Display' =
+			FORMAT([Load Index (Actual, DC-Heavy)], "0.0") & " (index, 2021=100)   " &
+			IF([Load Index YoY Delta (DC-Heavy)] >= 0, "▲ ", "▼ ") &
+			FORMAT(ABS([Load Index YoY Delta (DC-Heavy)]), "0.0%") & " vs. year ago"
+		displayFolder: 5. KPI card text
+		lineageTag: f2c3a4b5-6d7e-4890-9c1d-2e3f4051627e
+
+	measure 'KPI Control Display' =
+			FORMAT([Load Index (Actual, Control)], "0.0") & " (index, 2021=100)   " &
+			IF([Load Index YoY Delta (Control)] >= 0, "▲ ", "▼ ") &
+			FORMAT(ABS([Load Index YoY Delta (Control)]), "0.0%") & " vs. year ago"
+		displayFolder: 5. KPI card text
+		lineageTag: f2c3a4b5-6d7e-4890-9c1d-2e3f4051627f
+
+	measure 'KPI Trend Gap Display' = FORMAT([Trend Gap %], "+0.0%;-0.0%") & " vs. pre-2023 trend (data-centre regions avg.)"
+		displayFolder: 5. KPI card text
+		lineageTag: f2c3a4b5-6d7e-4890-9c1d-2e3f40516280
+
+	measure 'KPI HF Proxy Display' =
+			FORMAT([HF Cumulative Models], "#,##0") & " models on Hugging Face   " &
+			FORMAT([HF MoM Growth %], "+0.0%;-0.0%") & " vs. last month"
+		displayFolder: 5. KPI card text
+		lineageTag: f2c3a4b5-6d7e-4890-9c1d-2e3f40516281
+
+	column Value
+		lineageTag: c82cdb60-e7f0-4af1-8ffe-ccde8890837c
+		isNameInferred
+		sourceColumn: [Value]
+
+	partition _Measures = calculated
+		mode: import
+		source = ROW("Value", 0)
+

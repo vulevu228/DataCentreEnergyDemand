@@ -1,0 +1,67 @@
+table RegionMeta
+	lineageTag: e1b2f3d4-5c6a-4789-8b0c-1d2e3f405162
+
+	column region_id
+		dataType: string
+		lineageTag: e1b2f3d4-5c6a-4789-8b0c-1d2e3f405163
+		summarizeBy: none
+		sourceColumn: region_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column region_label
+		dataType: string
+		lineageTag: e1b2f3d4-5c6a-4789-8b0c-1d2e3f405164
+		summarizeBy: none
+		sourceColumn: region_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column role
+		dataType: string
+		lineageTag: e1b2f3d4-5c6a-4789-8b0c-1d2e3f405165
+		summarizeBy: none
+		sourceColumn: role
+
+		annotation SummarizationSetBy = Automatic
+
+	column sort_order
+		dataType: int64
+		formatString: 0
+		lineageTag: e1b2f3d4-5c6a-4789-8b0c-1d2e3f405166
+		summarizeBy: sum
+		sourceColumn: sort_order
+
+		annotation SummarizationSetBy = Automatic
+
+	column display_name
+		dataType: string
+		lineageTag: e1b2f3d4-5c6a-4789-8b0c-1d2e3f405167
+		summarizeBy: none
+		sourceColumn: display_name
+
+		annotation SummarizationSetBy = Automatic
+
+	partition RegionMeta = m
+		mode: import
+		source =
+				let
+				  Source = #table(
+				      {"region_id", "region_label", "role", "sort_order", "display_name"},
+				      {
+				          {"US-PJM-DOM", "Dominion / N. Virginia", "DC-Heavy", 1, "Northern Virginia ('Data Center Alley', US)"},
+				          {"EU-IE-SEM", "Ireland (SEM)", "DC-Heavy", 2, "Ireland (~21% of grid load is data centres)"},
+				          {"US-ERCO", "ERCOT (Texas)", "DC-Heavy", 3, "Texas / ERCOT (fast-growing DC + crypto load)"},
+				          {"EU-DE-LU", "Germany-Luxembourg", "DC-Heavy", 4, "Germany-Luxembourg (Frankfurt DC hub)"},
+				          {"US-PJM", "PJM Interconnection", "DC-Heavy", 5, "PJM Interconnection (US mid-Atlantic grid)"},
+				          {"US-SWPP", "Southwest Power Pool", "Control", 6, "Southwest Power Pool (low-DC control, US)"},
+				          {"EU-PT", "Portugal", "Control", 7, "Portugal (low-DC control, EU)"},
+				          {"PROXY-HF", "Hugging Face model growth", "Proxy", 8, "AI-Compute Proxy (Hugging Face public models)"}
+				      }
+				  ),
+				  #"Changed Type" = Table.TransformColumnTypes(Source, {{"region_id", type text}, {"region_label", type text}, {"role", type text}, {"sort_order", Int64.Type}, {"display_name", type text}})
+				in
+				  #"Changed Type"
+
+	annotation PBI_ResultType = Table
+
